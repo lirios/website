@@ -1,12 +1,20 @@
 language: go
 
+sudo: false
+
 go:
   - 1.5
   - 1.6
   - tip
 
+install:
+  - export GOPATH="${TRAVIS_BUILD_DIR}/Godeps/_workspace:$GOPATH"
+  - export PATH="${TRAVIS_BUILD_DIR}/Godeps/_workspace/bin:$PATH"
+before_script:
+  - go vet ./...
 script:
-  - go build
+  - go build ./...
+  - go test -v ./...
 
 notifications:
   email: false
