@@ -24,12 +24,12 @@
 package main
 
 import (
-    "fmt"
-    "net/http"
-    "io/ioutil"
-    "encoding/json"
-    "gopkg.in/gcfg.v1"
-    "os"
+	"encoding/json"
+	"fmt"
+	"gopkg.in/gcfg.v1"
+	"io/ioutil"
+	"net/http"
+	"os"
 )
 
 // Global configuration object.
@@ -38,8 +38,8 @@ var Config Settings
 func main() {
 	fillConfig()
 
-    http.HandleFunc("/team", teamHandler)
-    http.ListenAndServe(Config.Server.Port, nil)
+	http.HandleFunc("/team", teamHandler)
+	http.ListenAndServe(Config.Server.Port, nil)
 }
 
 func fillConfig() {
@@ -47,7 +47,7 @@ func fillConfig() {
 	var path string = "./config.ini"
 
 	//check for config path agrument
-	if len(os.Args) > 1{
+	if len(os.Args) > 1 {
 		//get the args and ignore program path
 		args := os.Args[1:]
 		//replace default path
@@ -60,7 +60,7 @@ func fillConfig() {
 }
 
 func teamHandler(w http.ResponseWriter, r *http.Request) {
-	resp := textFromUrl("https://slack.com/api/users.list?presence=1&token="+Config.Slack.Token)
+	resp := textFromUrl("https://slack.com/api/users.list?presence=1&token=" + Config.Slack.Token)
 
 	//parse to go object (all unnecessary info is ignored)
 	result := UserListData{}
@@ -70,7 +70,7 @@ func teamHandler(w http.ResponseWriter, r *http.Request) {
 	//parse the object back to json and print it
 	final_json, err := json.Marshal(result)
 	check(err)
-    fmt.Fprintf(w, string(final_json))
+	fmt.Fprintf(w, string(final_json))
 }
 
 func textFromUrl(url string) string {
@@ -79,7 +79,7 @@ func textFromUrl(url string) string {
 	check(err)
 	body, err := ioutil.ReadAll(resp.Body)
 	check(err)
-    return string(body)
+	return string(body)
 }
 
 func check(err error) {
@@ -89,16 +89,16 @@ func check(err error) {
 }
 
 type UserListData struct {
-	Ok bool `json:"ok"`
+	Ok      bool `json:"ok"`
 	Members []struct {
-		Name string `json:"name"`
+		Name     string `json:"name"`
 		RealName string `json:"real_name"`
-		TzLabel string `json:"tz_label"`
-		Profile struct {
+		TzLabel  string `json:"tz_label"`
+		Profile  struct {
 			Image192 string `json:"image_192"`
 			Image512 string `json:"image_512"`
 		} `json:"profile"`
-		IsBot bool `json:"is_bot"`
+		IsBot    bool   `json:"is_bot"`
 		Presence string `json:"presence,omitempty"`
 	} `json:"members"`
 }
