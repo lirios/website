@@ -24,8 +24,45 @@
 package main
 
 import (
+	"encoding/json"
+	"net/http"
+	"net/http/httptest"
+	"os"
 	"testing"
 )
 
-func TestMain(t *testing.T) {
+func TestTeam(t *testing.T) {
+	// Configure the Web server.
+	Config.Server.Port = ":8887"
+	Config.Slack.Token = os.Getenv("SLACK_TOKEN")
+
+	// New request to the API.
+	req, err := http.NewRequest("GET", "/team", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Record the response.
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(teamHandler)
+
+	// Serve.
+	handler.ServeHTTP(rr, req)
+
+	// Verify the status code.
+	if status := rr.Code; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
+	}
+
+	// Check the response body is what we expect.
+	result := UserListData{}
+	err = json.Unmarshal([]byte(rr.Body.String()), &result)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !result.Ok {
+		t.Errorf("handler returned unexpected Ok: got %v want %v",
+			result.Ok, true)
+	}
 }
