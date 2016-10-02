@@ -1,0 +1,13 @@
+language: go
+
+go:
+  - 1.5
+  - 1.6
+  - tip
+
+script:
+  - go build
+
+notifications:
+  email: false
+  slack: lirios:fdUqVmPzqPskEL1UBhqapZ0w
