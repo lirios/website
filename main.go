@@ -28,34 +28,39 @@ import (
     "net/http"
     "io/ioutil"
     "encoding/json"
+    "gopkg.in/gcfg.v1"
     "os"
-    "strings"
 )
 
-var token string
+// Global configuration object.
+var Config Settings
 
 func main() {
-	var path string = "./token.txt"
+	fillConfig()
 
+    http.HandleFunc("/team", teamHandler)
+    http.ListenAndServe(Config.Server.Port, nil)
+}
+
+func fillConfig() {
+	//default ini path
+	var path string = "./config.ini"
+
+	//check for config path agrument
 	if len(os.Args) > 1{
 		//get the args and ignore program path
 		args := os.Args[1:]
-
 		//replace default path
 		path = args[0]
 	}
 
-	//read token from file
-	file := readFile(path)
-	//extract first line to token
-	token = file[0:strings.Index(file, "\n")]
+	err := gcfg.ReadFileInto(&Config, path)
+	check(err)
 
-    http.HandleFunc("/team", teamHandler)
-    http.ListenAndServe(":8887", nil)
 }
 
 func teamHandler(w http.ResponseWriter, r *http.Request) {
-	resp := textFromUrl("https://slack.com/api/users.list?presence=1&token="+token)
+	resp := textFromUrl("https://slack.com/api/users.list?presence=1&token="+Config.Slack.Token)
 
 	//parse to go object (all unnecessary info is ignored)
 	result := UserListData{}
@@ -77,12 +82,6 @@ func textFromUrl(url string) string {
     return string(body)
 }
 
-func readFile(path string) string{
-	dat, err := ioutil.ReadFile(path)
-    check(err)
-    return string(dat)
-}
-
 func check(err error) {
 	if err != nil {
 		panic(err)
@@ -102,4 +101,14 @@ type UserListData struct {
 		IsBot bool `json:"is_bot"`
 		Presence string `json:"presence,omitempty"`
 	} `json:"members"`
+}
+
+// Represents settings file.
+type Settings struct {
+	Server struct {
+		Port string
+	}
+	Slack struct {
+		Token string
+	}
 }
