@@ -5,9 +5,9 @@ Web Site
 
 [![License](https://img.shields.io/badge/license-AGPLv3.0-blue.svg)](https://www.gnu.org/licenses/agpl-3.0.html)
 [![GitHub release](https://img.shields.io/github/release/lirios/website.svg)](https://github.com/lirios/website)
-[![Build Status](https://travis-ci.org/lirios/website.svg?branch=master)](https://travis-ci.org/lirios/website)
+[![Build Status](https://travis-ci.org/lirios/website.svg?branch=develop)](https://travis-ci.org/lirios/website)
 [![GitHub issues](https://img.shields.io/github/issues/lirios/website.svg)](https://github.com/lirios/website/issues)
-[![Maintained](https://img.shields.io/maintenance/yes/2016.svg)](https://github.com/lirios/website/commits/master)
+[![Maintained](https://img.shields.io/maintenance/yes/2016.svg)](https://github.com/lirios/website/commits/develop)
 
 Server-side counterpart of the Liri Web site.
 
