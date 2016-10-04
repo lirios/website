@@ -1,11 +1,18 @@
+sudo: required
+
 language: go
 
-sudo: false
+services:
+  - docker
 
 env:
   global:
     # SLACK_TOKEN
     - secure: "SKA9st/AvlorcIkL5IRgxjZpVipxI4qHBhbIPXXJ8JRtCzKhvq2CNXqQA5l/sqCRC91R44hZTrQkHrC8PMu/MAxPS5FtNQzO7/xUYcuYiv6C+4d4H+urZqhipBJHKWbf9tZl1noVguIDPsyp/Tt00tCxd1gjpHXuC4zHM98TUhXFJ0dTOa2r7WyQfTk7O6ITfRCZFeR2IUCJRlehMUz0XqIMkMNIXBpEVrQlzsJLf04WSG9uY44nq6QBGed0oyNVAq9Qvv6rcOXmwI0emDIIt6v79tuyz/quQfacH0kuxj/w99a4s0KOyyaz2All4Dh+dEkRCe0tgs8VSaufer6ZEcfL9rNjwdpPmWxt/buLtfGx533LJqFZYV4QiMm+VGsxeGp79v7WrFnNqks9JBOFGOnWVKm781nSGlF/Ek19hbZVUAOaBPyWPs+rqtjz9Uw2Iziry3UB/rfBhZnI15pwTDHdemcIFZm6FGwvAj+fzxKojG+TVJwM3hy2Lpf8K5QeV1Q3eN/jYEsrThUjPyqrGJW/3yKmSESsfDsQKFarFVmSK9jm1w4KDMWQ8zA9I/H1iEkuHEZ4vkPxLUCO28t2etqMknzMugJFcRB5xagYP5MX/0EbLt54ra1qpx2T4BxYw26bUNlr4zKsLuv0LY35Oe0XnyQ7tCO25Ds7ZjR6DUY="
+    # BINTRAY_USER
+    secure: "Sl5zwfnqK/IwbMngWO1vZ4R/+YzPslUbmtmT8cHD0mE4ifGHCFxCCRpV8jRFx813P3m1VkmH2/klcoXRllbitLNjJju/s8mjTzKiuc3iHDv/DJbUWB2bRLqYTbqSWxYxDvUDn9kMyCgnuCKqJwj5aaYZ4DtNA3J1+wlscxiFE+OayXzSDDi9tSCoYCBD3ddRfi7vTD2j0u+D/441VaYYARR2rcLPWt8bOi0IZVJrdufk1KcYDMd6uv6GRnpfehoTMNMR6O9fiZdR4YQUxiMt/WUMfDBuVgRixeubOhFQq5jDIpr69mfrSSl38H2/l4yupZ3ORY8yx/JT4aLoKCzf1INmjrsiohsJRQXWaqL0AsRwD7H7MVPmTepWqRTxjaCSkyAE8gEz+9v53eg/+5PEmLOXaZ10oG6etFuPxWdBngNw4mGfjK8y7nr3mnTAw3bt5aQ4HWO34g61rMkpR/xqZXYX+KXMBv3n28q09uQ4XAgCKv+R1l9N0hZL372p8tzBGt6d/+2zJq2B1zc8XGnloluVZdX7eJucw9hYC9GZp0WVuoweD1Z7NcCTDDNyG4dlIvSpMRdsooUIl6bR0m8A2xXfhCJUQ++L9yme0728FhnP4t6P1EVw2lbTWF2burrbC4ahcdnZq7vlhGalkIsVr+CwIn/1dKF8AHmVVh80AY8="
+    # BINTRAY_API_KEY
+    secure: "Of12ElHhQ3KyjvaGglhw/n6r+xdSBg+0upyxHSJLv/3zlCNt1EabmMwPxIjFXgvntJjRKX9oc5Pv+5oY1i2NqpVwdoM1avIdZOlRipcjn7+GrSqC9m9AaxhMShixT7X8J5bZdY/hiAJoGXax4fWvDwjBJIkBPIItxDuyJmkpZSrq2Jx4ezDMyxxM6rBFse0OVSm+D6cWq/hk9z6pHJfvRRb+dpYqws3PBqpA2qPxeJcDYJWvvTI41jJ3S9wpYWGsLxkXfTNLjdp6sghqphhmLj/8kA7yz/qPZLhL26soI6s2sA14q9mebzU1k/ZElpcj3Y1Tyw/WTste+QMrEOfsYeruVPLqaCOBpbzO9qIYAU/MrAzxi8Pi50/hGY4flsV+k6J9pECjdyf7vHjGXOOxmIVcsRER5pzekmdy45ZT/yjkvTizLAJgH206F7kJj7ZY2goX+7BPeX7z02rgxuXCE7+i1M2GU7hMMJVpbSuVAS3zgFW+9VNhXJlmCQw51BPwQtlNzM8BvMRWWHtbL29ArdU1UjhAaiC4aWcL9DZtDNxIK+KbjstlNBFNyrUO8btmvN9CzlHTnvXDXZj8Mzy+uBZaOeTY48wWtGBrc/qNMxeTc+cUuA3EG/m1Gk4eSKYC+v6IGfSjtrTNceNyZyDfDeusQgZYuxR7bb9j/eJjMqk="
 
 go:
   - 1.6
@@ -19,6 +26,14 @@ before_script:
 script:
   - go build ./...
   - go test -v
+after_success:
+  - docker build -t liri/website .
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then
+    local _image_id="$(docker images -q liri-website)"
+    docker login -u="$BINTRAY_USER" -p="$BINTRAY_API_KEY" liri-docker-infra.bintray.io;
+    docker tag $_image_id liri-docker-infra.bintray.io/www/serverside:latest;
+    docker push liri-docker-infra.bintray.io/www/serverside:latest;
+    fi
 
 notifications:
   email: false
