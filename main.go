@@ -97,6 +97,8 @@ type UserListData struct {
 		Name     string `json:"name"`
 		RealName string `json:"real_name"`
 		TzLabel  string `json:"tz_label"`
+		Tz	 string `json:"tz"`
+		TzOffset int	`json:"tz_offset"`
 		Profile  struct {
 			Image192 string `json:"image_192"`
 			Image512 string `json:"image_512"`
