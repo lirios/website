@@ -29,7 +29,7 @@ script:
 after_success:
   - docker build -t liri/website .
   - if [ "$TRAVIS_BRANCH" == "master" ]; then
-    local _image_id="$(docker images -q liri-website)";
+    local _image_id="$(docker images -q liri/website)";
     docker login -u="$BINTRAY_USER" -p="$BINTRAY_API_KEY" liri-docker-infra.bintray.io;
     docker tag $_image_id liri-docker-infra.bintray.io/www/serverside:latest;
     docker push liri-docker-infra.bintray.io/www/serverside:latest;
