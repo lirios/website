@@ -5,4 +5,4 @@ RUN go install github.com/lirios/website
 RUN rm -rf /go/src
 WORKDIR /go/bin
 ENTRYPOINT /go/bin/website
-EXPOSE 80
+EXPOSE 8080
