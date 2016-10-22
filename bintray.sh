@@ -33,13 +33,16 @@
 # $END_LICENSE$
 #
 
+echo "Building Docker container..."
 docker build -t liri/website .
+
 if [ -z "$TRAVIS_PULL_REQUEST" ] || [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
     if [ "$TRAVIS_BRANCH" == "master" ]; then
         local _image_id="$(docker images -q liri/website)"
         docker login -u="$BINTRAY_USER" -p="$BINTRAY_API_KEY" liri-docker-infra.bintray.io
         docker tag $_image_id liri-docker-infra.bintray.io/www/serverside:latest
         docker push liri-docker-infra.bintray.io/www/serverside:latest
+        echo "Pushed image $_image_id to Bintray"
     else
         echo "Skipping deployment on branch $TRAVIS_BRANCH"
     fi
