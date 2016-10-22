@@ -39,9 +39,13 @@ docker build -t liri/website .
 if [ -z "$TRAVIS_PULL_REQUEST" ] || [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
     if [ "$TRAVIS_BRANCH" == "master" ]; then
         _image_id="$(docker images -q liri/website)"
-        docker login -u="$BINTRAY_USER" -p="$BINTRAY_API_KEY" liri-docker-infra.bintray.io
-        docker tag $_image_id liri-docker-infra.bintray.io/www/serverside:latest
-        docker push liri-docker-infra.bintray.io/www/serverside:latest
+        if [ -z "$_image_id" ]; then
+            echo "No image found for liri/website!"
+            exit 127
+        fi
+        docker login -u="$BINTRAY_USER" -p="$BINTRAY_API_KEY" liri-docker-infra.bintray.io || exit 1
+        docker tag $_image_id liri-docker-infra.bintray.io/www/serverside:latest || exit 1
+        docker push liri-docker-infra.bintray.io/www/serverside:latest || exit 1
         echo "Pushed image $_image_id to Bintray"
     else
         echo "Skipping deployment on branch $TRAVIS_BRANCH"
