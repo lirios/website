@@ -31,7 +31,7 @@ deploy:
   provider: script
   script: bintray.sh
   on:
-    branch: develop
+    branch: master
   skip_cleanup: true
 
 notifications:
