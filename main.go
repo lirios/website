@@ -30,6 +30,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strings"
 )
 
 // Global configuration object.
@@ -60,8 +61,10 @@ func fillConfig() {
 }
 
 func teamHandler(w http.ResponseWriter, r *http.Request) {
-	//js won't accept json from another site otherwise
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+	//for easyer debugging - js won't accept json from another domain otherwise
+	if strings.Contains(r.Host, "localhost") {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+	}
 
 	resp := textFromUrl("https://slack.com/api/users.list?presence=1&token=" + Config.Slack.Token)
 
@@ -97,8 +100,8 @@ type UserListData struct {
 		Name     string `json:"name"`
 		RealName string `json:"real_name"`
 		TzLabel  string `json:"tz_label"`
-		Tz	 string `json:"tz"`
-		TzOffset int	`json:"tz_offset"`
+		Tz       string `json:"tz"`
+		TzOffset int    `json:"tz_offset"`
 		Profile  struct {
 			Image192 string `json:"image_192"`
 			Image512 string `json:"image_512"`

@@ -33,23 +33,20 @@
 # $END_LICENSE$
 #
 
+echo "Building static binary..."
+rm -f website
+CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o website .
+
 echo "Building Docker container..."
 docker build -t liri/website .
 
-if [ -z "$TRAVIS_PULL_REQUEST" ] || [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
-    if [ "$TRAVIS_BRANCH" == "master" ]; then
-        _image_id="$(docker images -q liri/website)"
-        if [ -z "$_image_id" ]; then
-            echo "No image found for liri/website!"
-            exit 127
-        fi
-        docker login -u="$BINTRAY_USER" -p="$BINTRAY_API_KEY" liri-docker-infra.bintray.io || exit 1
-        docker tag $_image_id liri-docker-infra.bintray.io/www/serverside:latest || exit 1
-        docker push liri-docker-infra.bintray.io/www/serverside:latest || exit 1
-        echo "Pushed image $_image_id to Bintray"
-    else
-        echo "Skipping deployment on branch $TRAVIS_BRANCH"
-    fi
-else
-    echo "Skipping deployment for pull requests"
+_image_id="$(docker images -q liri/website)"
+if [ -z "$_image_id" ]; then
+    echo "No image found for liri/website!"
+    exit 127
 fi
+
+docker login -u="$BINTRAY_USER" -p="$BINTRAY_API_KEY" liri-docker-infra.bintray.io || exit 1
+docker tag $_image_id liri-docker-infra.bintray.io/www/serverside:latest || exit 1
+docker push liri-docker-infra.bintray.io/www/serverside:latest || exit 1
+echo "Pushed image $_image_id to Bintray"
