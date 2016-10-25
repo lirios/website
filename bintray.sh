@@ -47,7 +47,7 @@ if [ -z "$_image_id" ]; then
     exit 127
 fi
 
-docker login -u="$BINTRAY_USER" -p="$BINTRAY_API_KEY" liri-docker-infra.bintray.io || exit 1
-docker tag $_image_id liri-docker-infra.bintray.io/www/serverside:latest || exit 1
-docker push liri-docker-infra.bintray.io/www/serverside:latest || exit 1
+docker login -u="$BINTRAY_USER" -p="$BINTRAY_API_KEY" liri-docker-registry.bintray.io || exit 1
+docker tag $_image_id liri-docker-registry.bintray.io/library/website:latest || exit 1
+docker push liri-docker-registry.bintray.io/library/website:latest || exit 1
 echo "Pushed image $_image_id to Bintray"
