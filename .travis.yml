@@ -30,6 +30,7 @@ script:
 deploy:
   provider: script
   script: bintray.sh
+  go: 1.6
   on:
     branch: master
   skip_cleanup: true
