@@ -29,6 +29,13 @@ script:
 after_success:
   - ./bintray.sh
 
+deploy:
+  provider: script
+  script: bintray.sh
+  on:
+    branch: develop
+  skip_cleanup: true
+
 notifications:
   email: false
   slack: lirios:fdUqVmPzqPskEL1UBhqapZ0w
