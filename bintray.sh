@@ -36,6 +36,7 @@
 echo "Building static binary..."
 rm -f website
 CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o website . || exit 1
+strip -ps website || exit 1
 
 echo "Building Docker container..."
 docker build -t liri/website . || exit 1
