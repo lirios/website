@@ -33,13 +33,15 @@
 # $END_LICENSE$
 #
 
+set -e
+
 echo "Building static binary..."
 rm -f website
-CGO_ENABLED=0 GOOS=linux GOARCH=x86_64 go build -a -installsuffix cgo -o website . || exit 1
-strip -ps website || exit 1
+CGO_ENABLED=0 GOOS=linux GOARCH=x86_64 go build -a -installsuffix cgo -o website .
+strip -ps website
 
 echo "Building Docker container..."
-docker build -t liri/website . || exit 1
+docker build -t liri/website .
 
 _image_id="$(docker images -q liri/website)"
 if [ -z "$_image_id" ]; then
@@ -47,7 +49,7 @@ if [ -z "$_image_id" ]; then
     exit 127
 fi
 
-docker login -u="$BINTRAY_USER" -p="$BINTRAY_API_KEY" liri-docker-registry.bintray.io || exit 1
-docker tag $_image_id liri-docker-registry.bintray.io/library/website:latest || exit 1
-docker push liri-docker-registry.bintray.io/library/website:latest || exit 1
+docker login -u="$BINTRAY_USER" -p="$BINTRAY_API_KEY" liri-docker-registry.bintray.io
+docker tag $_image_id liri-docker-registry.bintray.io/library/website:latest
+docker push liri-docker-registry.bintray.io/library/website:latest
 echo "Pushed image $_image_id to Bintray"
