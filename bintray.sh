@@ -35,7 +35,7 @@
 
 echo "Building static binary..."
 rm -f website
-CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o website . || exit 1
+CGO_ENABLED=0 GOOS=linux GOARCH=x86_64 go build -a -installsuffix cgo -o website . || exit 1
 strip -ps website || exit 1
 
 echo "Building Docker container..."
