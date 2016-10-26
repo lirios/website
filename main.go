@@ -1,6 +1,7 @@
 /****************************************************************************
  * This file is part of Liri.
  *
+ * Copyright (C) 2016 Pier Luigi Fiorini <pierluigi.fiorini@gmail.com>
  * Copyright (C) 2016 Ziga Patacko Koderman <ziga.patacko@gmail.com>
  *
  * $BEGIN_LICENSE:AGPL3+$
@@ -26,11 +27,13 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"gopkg.in/gcfg.v1"
 	"io/ioutil"
 	"net/http"
 	"os"
+	"sort"
 	"strings"
+
+	"gopkg.in/gcfg.v1"
 )
 
 // Global configuration object.
@@ -73,6 +76,9 @@ func teamHandler(w http.ResponseWriter, r *http.Request) {
 	err := json.Unmarshal([]byte(resp), &result)
 	check(err)
 
+	// Put administrators first
+	sort.Sort(result.Members)
+
 	//parse the object back to json and print it
 	final_json, err := json.Marshal(result)
 	check(err)
@@ -94,21 +100,38 @@ func check(err error) {
 	}
 }
 
+type Member struct {
+	Name     string `json:"name"`
+	RealName string `json:"real_name"`
+	TzLabel  string `json:"tz_label"`
+	Tz       string `json:"tz"`
+	TzOffset int    `json:"tz_offset"`
+	Profile  struct {
+		Image192 string `json:"image_192"`
+		Image512 string `json:"image_512"`
+	} `json:"profile"`
+	IsBot    bool   `json:"is_bot"`
+	IsAdmin  bool   `json:"is_admin"`
+	Presence string `json:"presence,omitempty"`
+}
+
+type Members []Member
+
+func (slice Members) Len() int {
+	return len(slice)
+}
+
+func (slice Members) Less(i, j int) bool {
+	return (slice[i].IsAdmin && !slice[j].IsAdmin) || slice[i].Name < slice[j].Name
+}
+
+func (slice Members) Swap(i, j int) {
+	slice[i], slice[j] = slice[j], slice[i]
+}
+
 type UserListData struct {
-	Ok      bool `json:"ok"`
-	Members []struct {
-		Name     string `json:"name"`
-		RealName string `json:"real_name"`
-		TzLabel  string `json:"tz_label"`
-		Tz       string `json:"tz"`
-		TzOffset int    `json:"tz_offset"`
-		Profile  struct {
-			Image192 string `json:"image_192"`
-			Image512 string `json:"image_512"`
-		} `json:"profile"`
-		IsBot    bool   `json:"is_bot"`
-		Presence string `json:"presence,omitempty"`
-	} `json:"members"`
+	Ok      bool    `json:"ok"`
+	Members Members `json:"members"`
 }
 
 // Represents settings file.
