@@ -82,14 +82,17 @@ func teamHandler(w http.ResponseWriter, r *http.Request) {
 	// Parse the object back to json and print it
 	result := FilteredUserListData{Ok: data.Ok}
 	for _, v := range data.Members {
-		// Exclude deleted members and filter out some information
-		if !v.Deleted {
+		// Exclude deleted members and slackbot and filter out some information
+		if v.Id != "USLACKBOT" && !v.Deleted {
 			member := FilteredMember{}
 			member.Name = v.Name
 			member.RealName = v.RealName
 			member.Tz = v.Tz
-			member.Profile.Image192 = v.Profile.Image192
-			member.Profile.Image512 = v.Profile.Image512
+			if strings.Contains(v.Profile.Image512, "MISSING") {
+				member.Image = v.Profile.Image192
+			} else {
+				member.Image = v.Profile.Image512
+			}
 			member.Presence = v.Presence
 			result.Members = append(result.Members, member)
 		}

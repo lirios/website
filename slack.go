@@ -32,8 +32,13 @@ type Member struct {
 	Tz       string `json:"tz"`
 	TzOffset int    `json:"tz_offset"`
 	Profile  struct {
-		Image192 string `json:"image_192"`
-		Image512 string `json:"image_512"`
+		Image24   string `json:"image_24"`
+		Image32   string `json:"image_32"`
+		Image48   string `json:"image_48"`
+		Image72   string `json:"image_72"`
+		Image192  string `json:"image_192"`
+		Image512  string `json:"image_512"`
+		Image1024 string `json:"image_1024"`
 	} `json:"profile"`
 	IsBot    bool   `json:"is_bot"`
 	IsAdmin  bool   `json:"is_admin"`
@@ -64,10 +69,7 @@ type FilteredMember struct {
 	Name     string `json:"name"`
 	RealName string `json:"real_name"`
 	Tz       string `json:"tz"`
-	Profile  struct {
-		Image192 string `json:"image_192"`
-		Image512 string `json:"image_512"`
-	} `json:"profile"`
+	Image    string `json:"image"`
 	Presence string `json:"presence,omitempty"`
 }
 
