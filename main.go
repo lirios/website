@@ -72,14 +72,28 @@ func teamHandler(w http.ResponseWriter, r *http.Request) {
 	resp := textFromUrl("https://slack.com/api/users.list?presence=1&token=" + Config.Slack.Token)
 
 	//parse to go object (all unnecessary info is ignored)
-	result := UserListData{}
-	err := json.Unmarshal([]byte(resp), &result)
+	data := UserListData{}
+	err := json.Unmarshal([]byte(resp), &data)
 	check(err)
 
 	// Put administrators first
-	sort.Sort(result.Members)
+	sort.Sort(data.Members)
 
 	//parse the object back to json and print it
+	result := FilteredUserListData{Ok: data.Ok}
+	for _, v := range data.Members {
+		// Exclude deleted members and filter out some information
+		if !v.Deleted {
+			member := FilteredMember{}
+			member.Name = v.Name
+			member.RealName = v.RealName
+			member.Tz = v.Tz
+			member.Profile.Image192 = v.Profile.Image192
+			member.Profile.Image512 = v.Profile.Image512
+			member.Presence = v.Presence
+			result.Members = append(result.Members, member)
+		}
+	}
 	final_json, err := json.Marshal(result)
 	check(err)
 	fmt.Fprintf(w, string(final_json))
@@ -98,40 +112,6 @@ func check(err error) {
 	if err != nil {
 		panic(err)
 	}
-}
-
-type Member struct {
-	Name     string `json:"name"`
-	RealName string `json:"real_name"`
-	TzLabel  string `json:"tz_label"`
-	Tz       string `json:"tz"`
-	TzOffset int    `json:"tz_offset"`
-	Profile  struct {
-		Image192 string `json:"image_192"`
-		Image512 string `json:"image_512"`
-	} `json:"profile"`
-	IsBot    bool   `json:"is_bot"`
-	IsAdmin  bool   `json:"is_admin"`
-	Presence string `json:"presence,omitempty"`
-}
-
-type Members []Member
-
-func (slice Members) Len() int {
-	return len(slice)
-}
-
-func (slice Members) Less(i, j int) bool {
-	return (slice[i].IsAdmin && !slice[j].IsAdmin) || slice[i].Name < slice[j].Name
-}
-
-func (slice Members) Swap(i, j int) {
-	slice[i], slice[j] = slice[j], slice[i]
-}
-
-type UserListData struct {
-	Ok      bool    `json:"ok"`
-	Members Members `json:"members"`
 }
 
 // Represents settings file.
