@@ -47,14 +47,14 @@ func main() {
 }
 
 func fillConfig() {
-	//default ini path
+	// Default ini path
 	var path string = "./config.ini"
 
-	//check for config path agrument
+	// Check for config path agrument
 	if len(os.Args) > 1 {
-		//get the args and ignore program path
+		// Get the args and ignore program path
 		args := os.Args[1:]
-		//replace default path
+		// Replace default path
 		path = args[0]
 	}
 
@@ -64,14 +64,14 @@ func fillConfig() {
 }
 
 func teamHandler(w http.ResponseWriter, r *http.Request) {
-	//for easyer debugging - js won't accept json from another domain otherwise
+	// For easyer debugging - js won't accept json from another domain otherwise
 	if strings.Contains(r.Host, "localhost") || strings.Contains(r.Host, "127.0.0.1") {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 	}
 
 	resp := textFromUrl("https://slack.com/api/users.list?presence=1&token=" + Config.Slack.Token)
 
-	//parse to go object (all unnecessary info is ignored)
+	// Parse to go object (all unnecessary info is ignored)
 	data := UserListData{}
 	err := json.Unmarshal([]byte(resp), &data)
 	check(err)
@@ -79,7 +79,7 @@ func teamHandler(w http.ResponseWriter, r *http.Request) {
 	// Put administrators first
 	sort.Sort(data.Members)
 
-	//parse the object back to json and print it
+	// Parse the object back to json and print it
 	result := FilteredUserListData{Ok: data.Ok}
 	for _, v := range data.Members {
 		// Exclude deleted members and filter out some information
