@@ -48,7 +48,7 @@ func (slice Members) Len() int {
 }
 
 func (slice Members) Less(i, j int) bool {
-	return (slice[i].IsAdmin && !slice[j].IsAdmin) || slice[i].Name < slice[j].Name
+	return slice[i].IsAdmin && !slice[j].IsAdmin
 }
 
 func (slice Members) Swap(i, j int) {
