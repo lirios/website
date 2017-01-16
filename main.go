@@ -65,7 +65,7 @@ func fillConfig() {
 
 func teamHandler(w http.ResponseWriter, r *http.Request) {
 	//for easyer debugging - js won't accept json from another domain otherwise
-	if strings.Contains(r.Host, "localhost") {
+	if strings.Contains(r.Host, "localhost") || strings.Contains(r.Host, "127.0.0.1") {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 	}
 
