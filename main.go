@@ -29,6 +29,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"os"
 	"sort"
 	"strings"
@@ -88,8 +89,9 @@ func teamHandler(w http.ResponseWriter, r *http.Request) {
 			member.Name = v.Name
 			member.RealName = v.RealName
 			member.Tz = v.Tz
-			if strings.Contains(v.Profile.Image512, "MISSING") {
-				member.Image = v.Profile.Image192
+			u, err := url.QueryUnescape(v.Profile.Image512)
+			if err == nil {
+				member.Image = u
 			} else {
 				member.Image = v.Profile.Image512
 			}
