@@ -93,7 +93,7 @@ func teamHandler(w http.ResponseWriter, r *http.Request) {
 	result := FilteredUserListData{Ok: data.Ok}
 	for _, v := range data.Members {
 		// Exclude deleted members and slackbot and filter out some information
-		if v.Id != "USLACKBOT" && !v.Deleted {
+		if v.ID != "USLACKBOT" && !v.Deleted {
 			member := FilteredMember{}
 			member.Name = v.Name
 			member.RealName = v.RealName

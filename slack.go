@@ -24,8 +24,9 @@
 
 package main
 
+// Member represents a Slack team member.
 type Member struct {
-	Id       string `json:"id"`
+	ID       string `json:"id"`
 	Name     string `json:"name"`
 	RealName string `json:"real_name"`
 	TzLabel  string `json:"tz_label"`
@@ -46,25 +47,16 @@ type Member struct {
 	Presence string `json:"presence,omitempty"`
 }
 
+// Members is a list of Slack team members.
 type Members []Member
 
-func (slice Members) Len() int {
-	return len(slice)
-}
-
-func (slice Members) Less(i, j int) bool {
-	return slice[i].IsAdmin && !slice[j].IsAdmin
-}
-
-func (slice Members) Swap(i, j int) {
-	slice[i], slice[j] = slice[j], slice[i]
-}
-
+// UserListData is the content of Slack team members response.
 type UserListData struct {
 	Ok      bool    `json:"ok"`
 	Members Members `json:"members"`
 }
 
+// FilteredMember is a Member with filtered out information.
 type FilteredMember struct {
 	Name     string `json:"name"`
 	RealName string `json:"real_name"`
@@ -73,9 +65,26 @@ type FilteredMember struct {
 	Presence string `json:"presence,omitempty"`
 }
 
+// FilteredMembers is a list of filtered out members.
 type FilteredMembers []FilteredMember
 
+// FilteredUserListData is the response of our API service.
 type FilteredUserListData struct {
 	Ok      bool            `json:"ok"`
 	Members FilteredMembers `json:"members"`
+}
+
+// Len returns the length of the slice.
+func (slice Members) Len() int {
+	return len(slice)
+}
+
+// Less compares two slice items and returns true if index i should go before index j.
+func (slice Members) Less(i, j int) bool {
+	return slice[i].IsAdmin && !slice[j].IsAdmin
+}
+
+// Swap swaps two slice items.
+func (slice Members) Swap(i, j int) {
+	slice[i], slice[j] = slice[j], slice[i]
 }
