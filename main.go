@@ -29,6 +29,7 @@ import (
 
 	"github.com/gorilla/mux"
 	api "github.com/lirios/website/api"
+	cla "github.com/lirios/website/cla"
 	server "github.com/lirios/website/server"
 	"gopkg.in/gcfg.v1"
 )
@@ -36,10 +37,15 @@ import (
 // Context of the application.
 type ctx struct {
 	settings *server.Settings
+	cla      *cla.CLA
 }
 
 func (c ctx) Settings() *server.Settings {
 	return c.settings
+}
+
+func (c ctx) CLA() *cla.CLA {
+	return c.cla
 }
 
 // Application handler.
@@ -63,6 +69,11 @@ var routes = []struct {
 	route   string
 	handler func(server.Context, http.ResponseWriter, *http.Request) (int, []byte)
 }{
+	{"POST", "/cla/webhook", CLAWebhookHandler},
+	{"GET", "/cla/agreements", CLAListHandler},
+	{"POST", "/cla/agreements/{name}", CLAAgreeHandler},
+	{"DELETE", "/cla/agreements/{name}", CLADisagreeHandler},
+
 	{"GET", "/api/team", api.TeamHandler},
 }
 
@@ -78,13 +89,22 @@ func main() {
 		panic(err)
 	}
 
+	// Open the CLA database and defer closing
+	cla, err := cla.Open(settings.CLA.DatabasePath)
+	if err != nil {
+		panic(err)
+	}
+	defer cla.Close()
+
 	// Create context
-	appContext := &ctx{&settings}
+	appContext := &ctx{&settings, cla}
 
 	// Create router
 	r := mux.NewRouter()
 
 	// Add routes
+	r.PathPrefix("/static/").Handler(http.FileServer(http.Dir("web/")))
+	r.HandleFunc("/cla", claApp).Methods("GET")
 	for _, detail := range routes {
 		r.Handle(detail.route, appHandler{appContext, detail.handler}).Methods(detail.method)
 	}
