@@ -141,8 +141,8 @@ func TeamHandler(c server.Context, w http.ResponseWriter, r *http.Request) (int,
 	// Parse the object back to json and print it
 	result := filteredUserListData{Ok: data.Ok}
 	for _, v := range data.Members {
-		// Exclude deleted members and slackbot and filter out some information
-		if v.ID != "USLACKBOT" && !v.Deleted {
+		// Exclude deleted members, bots and filter out some information
+		if v.ID != "USLACKBOT" && !v.IsBot && !v.Deleted {
 			member := filteredMember{}
 			member.Name = v.Name
 			member.RealName = v.RealName
