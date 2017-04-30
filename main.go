@@ -1,7 +1,7 @@
 /****************************************************************************
  * This file is part of Liri.
  *
- * Copyright (C) 2016 Pier Luigi Fiorini <pierluigi.fiorini@gmail.com>
+ * Copyright (C) 2017 Pier Luigi Fiorini <pierluigi.fiorini@gmail.com>
  * Copyright (C) 2016 Ziga Patacko Koderman <ziga.patacko@gmail.com>
  *
  * $BEGIN_LICENSE:AGPL3+$
@@ -37,7 +37,17 @@ import (
 	"gopkg.in/gcfg.v1"
 )
 
-// Global configuration object.
+// Settings contains settings from a configuration file.
+type Settings struct {
+	Server struct {
+		Port string
+	}
+	Slack struct {
+		Token string
+	}
+}
+
+// Config is a global configuration object.
 var Config Settings
 
 func main() {
@@ -49,7 +59,7 @@ func main() {
 
 func fillConfig() {
 	// Default ini path
-	var path string = "./config.ini"
+	var path = "./config.ini"
 
 	// Check for config path agrument
 	if len(os.Args) > 1 {
@@ -61,16 +71,15 @@ func fillConfig() {
 
 	err := gcfg.ReadFileInto(&Config, path)
 	check(err)
-
 }
 
 func teamHandler(w http.ResponseWriter, r *http.Request) {
-	// For easyer debugging - js won't accept json from another domain otherwise
+	// For easier debugging - JavaScript won't accept json from another domain otherwise
 	if strings.Contains(r.Host, "localhost") || strings.Contains(r.Host, "127.0.0.1") {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 	}
 
-	resp := textFromUrl("https://slack.com/api/users.list?presence=1&token=" + Config.Slack.Token)
+	resp := textFromURL("https://slack.com/api/users.list?presence=1&token=" + Config.Slack.Token)
 
 	// Parse to go object (all unnecessary info is ignored)
 	data := UserListData{}
@@ -99,15 +108,15 @@ func teamHandler(w http.ResponseWriter, r *http.Request) {
 			result.Members = append(result.Members, member)
 		}
 	}
-	final_json, err := json.Marshal(result)
+	finalJSON, err := json.Marshal(result)
 	check(err)
-	fmt.Fprintf(w, string(final_json))
+	fmt.Fprintf(w, string(finalJSON))
 }
 
-func textFromUrl(url string) string {
+func textFromURL(url string) string {
 	resp, err := http.Get(url)
-	defer resp.Body.Close()
 	check(err)
+	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	check(err)
 	return string(body)
@@ -116,15 +125,5 @@ func textFromUrl(url string) string {
 func check(err error) {
 	if err != nil {
 		panic(err)
-	}
-}
-
-// Represents settings file.
-type Settings struct {
-	Server struct {
-		Port string
-	}
-	Slack struct {
-		Token string
 	}
 }
