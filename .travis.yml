@@ -15,7 +15,6 @@ env:
     - secure: "Of12ElHhQ3KyjvaGglhw/n6r+xdSBg+0upyxHSJLv/3zlCNt1EabmMwPxIjFXgvntJjRKX9oc5Pv+5oY1i2NqpVwdoM1avIdZOlRipcjn7+GrSqC9m9AaxhMShixT7X8J5bZdY/hiAJoGXax4fWvDwjBJIkBPIItxDuyJmkpZSrq2Jx4ezDMyxxM6rBFse0OVSm+D6cWq/hk9z6pHJfvRRb+dpYqws3PBqpA2qPxeJcDYJWvvTI41jJ3S9wpYWGsLxkXfTNLjdp6sghqphhmLj/8kA7yz/qPZLhL26soI6s2sA14q9mebzU1k/ZElpcj3Y1Tyw/WTste+QMrEOfsYeruVPLqaCOBpbzO9qIYAU/MrAzxi8Pi50/hGY4flsV+k6J9pECjdyf7vHjGXOOxmIVcsRER5pzekmdy45ZT/yjkvTizLAJgH206F7kJj7ZY2goX+7BPeX7z02rgxuXCE7+i1M2GU7hMMJVpbSuVAS3zgFW+9VNhXJlmCQw51BPwQtlNzM8BvMRWWHtbL29ArdU1UjhAaiC4aWcL9DZtDNxIK+KbjstlNBFNyrUO8btmvN9CzlHTnvXDXZj8Mzy+uBZaOeTY48wWtGBrc/qNMxeTc+cUuA3EG/m1Gk4eSKYC+v6IGfSjtrTNceNyZyDfDeusQgZYuxR7bb9j/eJjMqk="
 
 go:
-  - 1.6
   - 1.7
 
 install:
@@ -32,7 +31,7 @@ deploy:
   script: ./bintray.sh
   on:
     branch: master
-    condition: "$TRAVIS_GO_VERSION == 1.6*"
+    condition: "$TRAVIS_GO_VERSION == 1.7*"
   skip_cleanup: true
 
 notifications:
