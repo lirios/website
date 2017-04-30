@@ -8,7 +8,7 @@ Web Site
 [![Build Status](https://travis-ci.org/lirios/website.svg?branch=develop)](https://travis-ci.org/lirios/website)
 [![Go Report Card](https://goreportcard.com/badge/github.com/lirios/website)](https://goreportcard.com/report/github.com/lirios/website)
 [![GitHub issues](https://img.shields.io/github/issues/lirios/website.svg)](https://github.com/lirios/website/issues)
-[![Maintained](https://img.shields.io/maintenance/yes/2016.svg)](https://github.com/lirios/website/commits/develop)
+[![Maintained](https://img.shields.io/maintenance/yes/2017.svg)](https://github.com/lirios/website/commits/develop)
 
 Server-side counterpart of the Liri Web site.
 
