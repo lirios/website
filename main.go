@@ -50,8 +50,11 @@ type appHandler struct {
 
 func (t appHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	code, data := t.handler(t.ctx, w, r)
+	if code != http.StatusOK {
+		http.Error(w, string(data), code)
+		return
+	}
 	w.Write(data)
-	w.WriteHeader(code)
 }
 
 // Routes.
