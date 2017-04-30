@@ -2,7 +2,6 @@
  * This file is part of Liri.
  *
  * Copyright (C) 2017 Pier Luigi Fiorini <pierluigi.fiorini@gmail.com>
- * Copyright (C) 2016 Ziga Patacko Koderman <ziga.patacko@gmail.com>
  *
  * $BEGIN_LICENSE:AGPL3+$
  *
@@ -25,105 +24,68 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
 	"net/http"
-	"net/url"
 	"os"
-	"sort"
-	"strings"
 
+	"github.com/gorilla/mux"
+	api "github.com/lirios/website/api"
+	server "github.com/lirios/website/server"
 	"gopkg.in/gcfg.v1"
 )
 
-// Settings contains settings from a configuration file.
-type Settings struct {
-	Server struct {
-		Port string
-	}
-	Slack struct {
-		Token string
-	}
+// Context of the application.
+type ctx struct {
+	settings *server.Settings
 }
 
-// Config is a global configuration object.
-var Config Settings
+func (c ctx) Settings() *server.Settings {
+	return c.settings
+}
+
+// Application handler.
+type appHandler struct {
+	*ctx
+	handler func(server.Context, http.ResponseWriter, *http.Request) (int, []byte)
+}
+
+func (t appHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	code, data := t.handler(t.ctx, w, r)
+	w.Write(data)
+	w.WriteHeader(code)
+}
+
+// Routes.
+var routes = []struct {
+	method  string
+	route   string
+	handler func(server.Context, http.ResponseWriter, *http.Request) (int, []byte)
+}{
+	{"GET", "/api/team", api.TeamHandler},
+}
 
 func main() {
-	fillConfig()
-
-	http.HandleFunc("/team", teamHandler)
-	http.ListenAndServe(Config.Server.Port, nil)
-}
-
-func fillConfig() {
-	// Default ini path
-	var path = "./config.ini"
-
-	// Check for config path agrument
+	// Load settings
+	var settingsFileName = "./config.ini"
 	if len(os.Args) > 1 {
-		// Get the args and ignore program path
-		args := os.Args[1:]
-		// Replace default path
-		path = args[0]
+		settingsFileName = os.Args[1:][0]
 	}
-
-	err := gcfg.ReadFileInto(&Config, path)
-	check(err)
-}
-
-func teamHandler(w http.ResponseWriter, r *http.Request) {
-	// For easier debugging - JavaScript won't accept json from another domain otherwise
-	if strings.Contains(r.Host, "localhost") || strings.Contains(r.Host, "127.0.0.1") {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-	}
-
-	resp := textFromURL("https://slack.com/api/users.list?presence=1&token=" + Config.Slack.Token)
-
-	// Parse to go object (all unnecessary info is ignored)
-	data := UserListData{}
-	err := json.Unmarshal([]byte(resp), &data)
-	check(err)
-
-	// Put administrators first
-	sort.Sort(data.Members)
-
-	// Parse the object back to json and print it
-	result := FilteredUserListData{Ok: data.Ok}
-	for _, v := range data.Members {
-		// Exclude deleted members and slackbot and filter out some information
-		if v.ID != "USLACKBOT" && !v.Deleted {
-			member := FilteredMember{}
-			member.Name = v.Name
-			member.RealName = v.RealName
-			member.Tz = v.Tz
-			u, err := url.QueryUnescape(v.Profile.Image512)
-			if err == nil {
-				member.Image = u
-			} else {
-				member.Image = v.Profile.Image512
-			}
-			member.Presence = v.Presence
-			result.Members = append(result.Members, member)
-		}
-	}
-	finalJSON, err := json.Marshal(result)
-	check(err)
-	fmt.Fprintf(w, string(finalJSON))
-}
-
-func textFromURL(url string) string {
-	resp, err := http.Get(url)
-	check(err)
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	check(err)
-	return string(body)
-}
-
-func check(err error) {
+	var settings server.Settings
+	err := gcfg.ReadFileInto(&settings, settingsFileName)
 	if err != nil {
 		panic(err)
 	}
+
+	// Create context
+	appContext := &ctx{&settings}
+
+	// Create router
+	r := mux.NewRouter()
+
+	// Add routes
+	for _, detail := range routes {
+		r.Handle(detail.route, appHandler{appContext, detail.handler}).Methods(detail.method)
+	}
+
+	// Serve
+	http.ListenAndServe(settings.Server.Port, r)
 }
