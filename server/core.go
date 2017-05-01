@@ -23,17 +23,31 @@
 
 package server
 
+import (
+	cla "github.com/lirios/website/cla"
+)
+
 // Settings contains settings from a configuration file.
 type Settings struct {
 	Server struct {
-		Port string
+		Port    string
+		BaseURL string
+		SiteURL string
 	}
 	Slack struct {
 		Token string
+	}
+	CLA struct {
+		DatabasePath string
+		Token        string
+		HookSecret   string
+		ClientID     string
+		ClientSecret string
 	}
 }
 
 // Context interface.
 type Context interface {
 	Settings() *Settings
+	CLA() *cla.CLA
 }

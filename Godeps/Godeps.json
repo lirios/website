@@ -4,9 +4,38 @@
 	"GodepVersion": "v74",
 	"Deps": [
 		{
+			"ImportPath": "github.com/boltdb/bolt",
+			"Comment": "v1.3.0-29-g4b1ebc1",
+			"Rev": "4b1ebc1869ad66568b313d0dc410e2be72670dda"
+		},
+		{
+			"ImportPath": "github.com/google/go-github/github",
+			"Rev": "e8d46665e050742f457a58088b1e6b794b2ae966"
+		},
+		{
+			"ImportPath": "github.com/google/go-querystring/query",
+			"Rev": "53e6ce116135b80d037921a7fdd5138cf32d7a8a"
+		},
+		{
 			"ImportPath": "github.com/gorilla/mux",
 			"Comment": "v1.1-27-g757bef9",
 			"Rev": "757bef944d0f21880861c2dd9c871ca543023cba"
+		},
+		{
+			"ImportPath": "golang.org/x/net/context",
+			"Rev": "da118f7b8e5954f39d0d2130ab35d4bf0e3cb344"
+		},
+		{
+			"ImportPath": "golang.org/x/oauth2",
+			"Rev": "a6bd8cefa1811bd24b86f8902872e4e8225f74c4"
+		},
+		{
+			"ImportPath": "golang.org/x/oauth2/internal",
+			"Rev": "a6bd8cefa1811bd24b86f8902872e4e8225f74c4"
+		},
+		{
+			"ImportPath": "golang.org/x/sys/unix",
+			"Rev": "9ccfe848b9db8435a24c424abbc07a921adf1df5"
 		},
 		{
 			"ImportPath": "gopkg.in/gcfg.v1",
